@@ -1,7 +1,6 @@
 @extends('admin.layouts.app_admin')
 
 @section('content')
-    <h1>Admin test</h1>
     <div class="container">
         <div class="row">
             <div class="col-sm-3">
