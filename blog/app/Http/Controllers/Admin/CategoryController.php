@@ -15,6 +15,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        // вернуть переменную со списком категорий,
+        // коллекция разбивается постранично: 10 категорий на страницу
         return view('admin.categories.index', [
             'categories' => Category::paginate(10)
         ]);
@@ -27,7 +29,15 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        // category - пустой массив
+        // categories - коллекция категорий, полученная с помощью метода children модели Category,
+        // parent_id = 0 - получим только родительские категории
+        // delimiter - символ, обозначающий вложенность категорий
+        return view('admin.categories.create', [
+            'category'      => [],
+            'categories'    => Category::with('children')->where('parent_id', '0')->get(),
+            'delimiter'     => ''
+        ]);
     }
 
     /**
@@ -38,7 +48,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Создание записи в бд, передача всех значений формы
+        Category::create($request->all());
+        return redirect()->route('admin.category.index');
     }
 
     /**
@@ -60,7 +72,11 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return view('admin.categories.edit', [
+            'category'      => $category,
+            'categories'    => Category::with('children')->where('parent_id', '0')->get(),
+            'delimiter'     => ''
+        ]);
     }
 
     /**
@@ -72,7 +88,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        // исключить поле slug при редактировании записи
+        $category->update($request->except('slug'));
+        return redirect()->route('admin.category.index');
     }
 
     /**
@@ -83,6 +101,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return redirect()->route('admin.category.index');
     }
 }
